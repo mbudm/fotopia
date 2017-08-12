@@ -1,2 +1,2 @@
 # fotopia
-make sense of a photo archive
+tools to make sense of a photo archive
