@@ -4,5 +4,5 @@ module.exports = {
     fileSize: 100,
     pixels: (640 * 480)
   },
-  cwd: '/Volumes/Houston/Photographs'
+  cwd: '/Users/steve/Dropbox'
 }

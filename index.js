@@ -1,4 +1,5 @@
 const glob = require('glob');
+const ExifImage = require('exif').ExifImage;
 const config = require('./config.js');
 const options = {
   cwd: config.cwd,
@@ -29,9 +30,9 @@ function collectExtensions(files){
   }, {});
 }
 
-function getFiles(pattern = "**/*"){
+function getFiles(pattern = "**/*", opts){
   return new Promise((resolve, reject) => {
-    glob(pattern, options, function (er, files) {
+    glob(pattern, opts, function (er, files) {
       if(er){
         reject(er);
       }else{
@@ -40,10 +41,26 @@ function getFiles(pattern = "**/*"){
     });
   });
 }
-//""
-getFiles("**/*.{jpg,jpeg,mp4,mov,avi,png,pmg,gif}")
+
+function getImageData(image){
+  return new Promise((resolve, reject) => {
+      new ExifImage({ image }, (error, exifData) => {
+        if (error){
+          resolve({error});
+        }else{
+          resolve(exifData)
+        }
+    });
+  });
+}
+
+getFiles('**/*.{jpg,jpeg,mp4,mov,avi,png,pmg,gif}', options)
   .then((files)=>{
     const extensions = collectExtensions(files);
     console.log('file types count:', extensions);
+    return Promise.all(files.map((file) => getImageData(`${options.cwd}/${file}`)));
+  })
+  .then((data)=>{
+    console.log('imageData',data.length, data.slice(0,10));
   })
   .catch((err) => console.error(err));
