@@ -52,7 +52,11 @@ function getExifData(image){
   return new Promise((resolve, reject) => {
     new ExifImage({ image }, (error, exifData) => {
       if (error){
-        resolve({error});
+        if(error.code === 'NO_EXIF_SEGMENT'){
+          resolve(getImageDimensionsPromise(image));
+        }else{
+          resolve({error});
+        }
       }else{
         resolve(exifData);
       }
@@ -60,36 +64,38 @@ function getExifData(image){
   });
 }
 
-function getImageSizeAndDimensions(image){
+function getImageDimensionsPromise(image){
   return new Promise((resolve, reject) => {
     getImageDimensions(image, (err, dimensions) =>{
       if (err){
         resolve({err});
       }else{
-        fs.stat(image, function(error, stat) {
-          if(error) {
-            resolve({
-              ...dimensions,
-              error
-            });
-          }else{
-            resolve({
-              ...dimensions,
-              size: stat.size
-            });
-          }   
-        });
+        resolve(dimensions);
       }
     });
   });
 }
 
+function getFileSize(image){
+  return new Promise((resolve, reject) => {
+    fs.stat(image, function(error, stat) {
+      if(error) {
+        resolve(error);
+      }else{
+        resolve(stat.size);
+      }   
+    });
+  });
+}
+
 function getImageData(image){
-  if(isExifSupportedImage(image)){
-    return getExifData(image);
-  }else{
-    return getImageSizeAndDimensions(image);
-  }
+  const p = isExifSupportedImage(image) ? getExifData(image) : getImageDimensionsPromise(image)
+    return p.then((meta) => {
+      return {
+        path: image,
+        meta
+      };
+    });
 }
 
 getFiles('**/*.{jpg,jpeg,mp4,mov,avi,png,pmg,gif}', options)
@@ -98,7 +104,17 @@ getFiles('**/*.{jpg,jpeg,mp4,mov,avi,png,pmg,gif}', options)
     console.log('file types count:', extensions);
     return Promise.all(files.map((file) => getImageData(`${options.cwd}/${file}`)));
   })
+  .then((filesData)=>{
+    return Promise.all(filesData.map((fileData) => {
+      return getFileSize(fileData.path).then((size) => {
+        return {
+          ...fileData,
+          size
+        } 
+      });
+    }));
+  })
   .then((data)=>{
-    console.log('imageData',data.length, data.slice(0,10));
+    console.log('imageData',data.length, data.slice(0,100));
   })
   .catch((err) => console.error(err));
