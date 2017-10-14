@@ -5,12 +5,6 @@ const ExifImage = require('exif').ExifImage;
 const getImageDimensions = require('image-size');
 
 
-
-// find all photo/movie files
-// get the image metadata
-// add all these to a Database
-// filter out duplicates, corrupted files
-
 function getExtension(path){
   const ext = path.split('.').pop();
   return ext !== path ? ext : 'no-extension';
@@ -140,7 +134,5 @@ function getFiles(config){
         .catch((err) => console.error(err));
 }
 
-module.exports = {
-    getFiles
-}
+module.exports = getFiles
   
