@@ -1,4 +1,5 @@
 const fs = require('fs');
+const util = require('util');
 const glob = require('glob');
 const ExifImage = require('exif').ExifImage;
 const getImageDimensions = require('image-size');
@@ -58,10 +59,26 @@ function getExifData(image){
           resolve({error});
         }
       }else{
-        resolve(exifData);
+        resolve(normaliseExif(exifData));
       }
     });
   });
+}
+
+/* pluck width and height from exif, so it's the same as non exif data 
+{
+  width
+  height
+  type
+}
+*/
+function normaliseExif(exifData){
+ return {
+  width: exifData.exif.ExifImageWidth,
+  height: exifData.exif.ExifImageHeight,
+  type: 'jpg',
+  exifData
+ };
 }
 
 function getImageDimensionsPromise(image){
@@ -93,7 +110,7 @@ function getImageData(image){
     return p.then((meta) => {
       return {
         path: image,
-        meta
+        ...meta
       };
     });
 }
@@ -115,6 +132,6 @@ getFiles('**/*.{jpg,jpeg,mp4,mov,avi,png,pmg,gif}', options)
     }));
   })
   .then((data)=>{
-    console.log('imageData',data.length, data.slice(0,100));
+    console.log('imageData',data.length, JSON.stringify(data.slice(0,50), null, 5) );
   })
   .catch((err) => console.error(err));
