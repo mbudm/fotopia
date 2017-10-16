@@ -109,8 +109,9 @@ function getFiles(config){
       nodir: true,
       nocase: true
     };
+    const extensionsToSearch = config.extensions.length >1 ? `{${config.extensions.join()}}` : config.extensions[0]
     let extensions = null;
-    return getFileList(`**/*.{${config.extensions.join()}}`, options)
+    return getFileList(`**/*.${extensionsToSearch}`, options)
         .then((files)=>{
             extensions = collectExtensions(files);
             return Promise.all(files.map((file) => getImageData(`${options.cwd}/${file}`)));

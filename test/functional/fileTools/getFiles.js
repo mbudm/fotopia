@@ -17,15 +17,29 @@ const config = {
     cwd: mockBasePath
 }
 
-test('getFiles test', function (t) {
+test('getFiles test, excluding jpeg', function (t) {
+
     t.plan(4);
     
     t.equal(typeof getFiles, 'function');
     
     const fileList = getFiles(config)
         .then(fileList => {
-            t.deepEqual(fileList.data, mockImages);
+            t.equal(fileList.data.length, mockImages.length - 1);
             t.equal(fileList.data[0].path, path.join(mockBasePath, mockImages[0]));
-            t.deepEqual(fileList.extensions, {jpg:3, JPG:3});
+            t.deepEqual(fileList.extensions, {jpg:2, JPG:3});
+        });
+});
+
+test('getFiles test, including jpeg', function (t) {
+    
+    config.extensions.push('jpeg');
+    t.plan(3);
+    
+    const fileList = getFiles(config)
+        .then(fileList => {
+            t.equal(fileList.data.length, mockImages.length);
+            t.equal(fileList.data[0].path, path.join(mockBasePath, mockImages[0]));
+            t.deepEqual(fileList.extensions, {jpg:2, JPG:3, jpeg:1});
         });
 });
