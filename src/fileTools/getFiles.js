@@ -42,11 +42,13 @@ function getExifData(image){
   return new Promise((resolve, reject) => {
     new ExifImage({ image }, (error, exifData) => {
       if (error){
-        if(error.code === 'NO_EXIF_SEGMENT'){
-          resolve(getImageDimensionsPromise(image));
-        }else{
-          resolve({error});
-        }
+        resolve(getImageDimensionsPromise(image).then((dimensions) => {
+            return {
+              exifError: error,
+              ...dimensions
+            };
+          })
+        );
       }else{
         resolve(normaliseExif(exifData));
       }
