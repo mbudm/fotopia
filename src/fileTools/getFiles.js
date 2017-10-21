@@ -84,13 +84,21 @@ function getImageDimensionsPromise(image){
   });
 }
 
-function getFileSize(image){
+function getFileStats(image){
   return new Promise((resolve, reject) => {
     fs.stat(image, function(error, stat) {
-      if(error) {
+      if(error ) {
         resolve(error);
+      }else if(typeof stat !== "object"){
+        resolve({
+          nostat:true,
+          stat
+        });
       }else{
-        resolve(stat.size);
+        resolve({
+          size: stat.size,
+          birthtime: (stat.birthtime ? stat.birthtime : stat.mtime ),
+        });
       }   
     });
   });
@@ -120,10 +128,10 @@ function getFiles(config){
         })
         .then((filesData)=>{
             return Promise.all(filesData.map((fileData) => {
-                return getFileSize(fileData.path).then((size) => {
+                return getFileStats(fileData.path).then((stats) => {
                     return {
                     ...fileData,
-                    size
+                    ...stats
                     } 
                 });
             }));

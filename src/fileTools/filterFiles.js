@@ -38,11 +38,28 @@ function isAcceptableFileSize(item, config){
 }
 function isDuplicate(item, lookup){
     if(lookup[item.size]){
-        return true
+        if(similarBirthTime(lookup[item.size],item) || similarFileName(lookup[item.size],item)){
+            return true
+        }else{
+            return false;
+        }
     }else{
-        lookup[item.size] = true;
+        lookup[item.size] = item;
         return false
     }
 }
+
+function similarBirthTime(a,b){
+   return a.birthtime === b.birthtime;
+}
+
+function similarFileName(a, b){
+    return (getFilename(a.path) === getFilename(b.path));
+}
+
+function getFilename(path){
+    const filename = path.split('/').pop();
+    return filename.length > 0 ? filename : path;
+  }
 
 module.exports = filterFiles
