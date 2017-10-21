@@ -1,21 +1,31 @@
-/* https://www.npmjs.com/package/kairos-api
-var Kairos = require('kairos-api');
-var client = new Kairos('app_id', 'app_key');
- 
-var params = {
-  image: 'http://media.kairos.com/kairos-elizabeth.jpg',
-  subject_id: 'subtest1',
-  gallery_name: 'gallerytest1',
-  selector: 'SETPOSE'
-};
- 
-client.enroll(params)   // return Promise 
-  //  result: { 
-  //    status: <http status code>, 
-  //    body: <data> 
-  //  } 
-  .then(function(result) { ... })
-  // err -> array: jsonschema validate errors 
-  //        or throw Error 
-  .catch(function(err) { ... });
-  */
+// https://www.npmjs.com/package/kairos-api
+const Kairos = require('kairos-api');
+const b64 = require('node-base64-image');
+
+function getKairosClient(appId, appKey){
+  return new Kairos(appId, appKey);
+}
+
+function enroll(imageItem, subject, config){
+  return new Promise(resolve, reject => {
+    if(!imageItem.subject){
+      reject('You need to add a subject to enroll an image');
+    }else{
+      encode(imageItem.path, {local: true}, (err, image) => {
+        if(err){
+          reject(err);
+        }else{
+          resolve(image);
+        }
+      })
+    }
+  })
+  .then(b64Image => {
+    const client = getKairosClient(config.api.kairos.appId, config.api.kairos.key);
+    return client.enroll({
+      image: b64Image,
+      subject_id: imageItem.subject,
+      gallery_name: config.api.kairos.gallery 
+    });
+  });
+}

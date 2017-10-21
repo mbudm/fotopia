@@ -10,7 +10,8 @@ module.exports = {
     kairos:{
       appId: '<your app id>',
       key: '<key>',
-      base_url: 'api.kairos.com'
+      base_url: 'api.kairos.com',
+      gallery: 'fotopia'
     }
   }
 }
