@@ -5,6 +5,7 @@ module.exports = {
     pixels: (640 * 480)
   },
   cwd: '/path/to/images',
+  temp: './temp',
   api:{
     kairos:{
       appId: '<your app id>',

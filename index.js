@@ -1,5 +1,6 @@
 const config = require('./config.js');
 const fileTools = require('./src/fileTools');
+const path = require('path');
 
 
 // find all photo/movie files
@@ -25,6 +26,13 @@ const files = fileTools.getFiles(config)
     })
     console.log('rejected tally', rejectedTally);
     console.log('2. time taken', Date.now() - startTime);
+
+    const cwdPrefix = config.cwd.split('/');
+    const timestamp = Date.now();
+    const listPath = path.join(config.temp, cwdPrefix.pop() + '-' + timestamp + '.json');
+
+    console.log('listPath', listPath);
+    fileTools.writeJson(filteredList, listPath);
   });
 
 
