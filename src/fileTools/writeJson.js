@@ -2,19 +2,21 @@ const fs = require('fs');
 const path = require('path');
 
 function writeJson(obj, filePath){
-  ensureDirectoryExistence(filePath);
-  const json = JSON.stringify(obj);
-  try {
-    fs.writeFile(filePath, json, function(err) {
-      if(err) {
-        return console.log(err);
-      }else{
-        console.log("file saved");
-      }
-    });
-  } catch (err) {
-    console.error(err);
-  }
+  return new Promise((resolve, reject) => {
+    ensureDirectoryExistence(filePath);
+    const json = JSON.stringify(obj);
+    try {
+      fs.writeFile(filePath, json, function(err) {
+        if(err) {
+          return reject(err);
+        }else{
+          resolve(filePath);
+        }
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
 }
 
 function ensureDirectoryExistence(filePath) {
