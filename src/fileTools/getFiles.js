@@ -1,12 +1,13 @@
 const fs = require('fs');
+const path = require('path');
 const glob = require('glob');
 const { ExifImage } = require('exif');
 const getImageDimensions = require('image-size');
 
 
-function getExtension(path) {
-  const ext = path.split('.').pop();
-  return ext !== path ? ext : 'no-extension';
+function getExtension(filePath) {
+  const ext = filePath.split('.').pop();
+  return ext !== filePath ? ext : 'no-extension';
 }
 
 function collectExtensions(files) {
@@ -97,10 +98,15 @@ function getFileStats(image) {
   });
 }
 
-function getImageData(image) {
-  const p = isExifSupportedImage(image) ? getExifData(image) : getImageDimensionsPromise(image);
+
+function getImageData(cwd, image) {
+  const imgPath = `${cwd}/${image}`;
+  const p = isExifSupportedImage(imgPath) ?
+    getExifData(imgPath) :
+    getImageDimensionsPromise(imgPath);
   return p.then(meta => ({
-    path: image,
+    path: imgPath,
+    src: path.relative(process.cwd(), imgPath),
     ...meta,
   }));
 }
@@ -116,7 +122,7 @@ function getFiles(config) {
   return getFileList(`**/*.${extensionsToSearch}`, options)
     .then((files) => {
       extensions = collectExtensions(files);
-      return Promise.all(files.map(file => getImageData(`${options.cwd}/${file}`)));
+      return Promise.all(files.map(file => getImageData(options.cwd, file)));
     })
     .then(filesData => Promise.all(filesData.map(fileData => getFileStats(fileData.path)
       .then(stats => ({

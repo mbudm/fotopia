@@ -1,0 +1,22 @@
+mixin file(item, source)
+  li
+    h3 #{item.path.split('/').pop()}
+    img(src=item.src)
+    div
+    h4 Details
+    dl
+      dt width
+      dd #{item.width}
+      dt height
+      dd #{item.height}
+      dt size
+      dd #{item.size}
+      dt birthtime
+      dd #{item.birthtime}
+    if item.exifData
+      h5 Exif data
+      dl
+        dt ImageDescription
+        dd #{item.exifData.image.ImageDescription}
+        dt Artist
+        dd #{item.exifData.image.Artist}
