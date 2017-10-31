@@ -25,7 +25,8 @@ function buildListPath() {
 }
 
 fileTools.getFiles(config)
-  .then(fileList => logThen('getFiles', createFilelistLogData(fileList), fileTools.filterFiles(config, fileList.data)))
+  .then(fileList => logThen('getFiles', createFilelistLogData(fileList), fileTools.createThumbnails(fileList.data, config)))
+  .then(thumbsList => logThen('thumbsCreated', { thumbsList }, fileTools.filterFiles(config, thumbsList)))
   .then(filteredList => logThen('filterFiles', fileTools.summariseFilteredList(filteredList), fileTools.writeJson(filteredList, buildListPath())))
   .then(filePath => logThen('listSaved', { filePath }, createReviewServer(filePath)))
   .then((appListener) => {

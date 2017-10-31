@@ -3,6 +3,7 @@ const filterFiles = require('./filterFiles');
 const writeJson = require('./writeJson');
 const summariseFilteredList = require('./summariseFilteredList');
 const readJson = require('./readJson');
+const createThumbnails = require('./createThumbnails');
 
 module.exports = {
   getFiles,
@@ -10,4 +11,5 @@ module.exports = {
   writeJson,
   summariseFilteredList,
   readJson,
+  createThumbnails,
 };
