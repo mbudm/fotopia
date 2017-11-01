@@ -5,6 +5,9 @@ mixin file(item, source)
     div
     h4 Details
     dl
+      if item.reason
+        dt Rejected for:
+        dd #{item.reason}
       dt width
       dd #{item.width}
       dt height
@@ -16,7 +19,9 @@ mixin file(item, source)
     if item.exifData
       h5 Exif data
       dl
-        dt ImageDescription
-        dd #{item.exifData.image.ImageDescription}
-        dt Artist
-        dd #{item.exifData.image.Artist}
+        if item.exifData.image.ImageDescription
+          dt ImageDescription
+          dd #{item.exifData.image.ImageDescription}
+        if item.exifData.image.Artist
+          dt Artist
+          dd #{item.exifData.image.Artist}

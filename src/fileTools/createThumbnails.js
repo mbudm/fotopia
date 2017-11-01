@@ -8,7 +8,7 @@ function createThumbnailFilename(filename, thumbPath) {
 
 function createThumbnail(filename, thumbnail) {
   return sharp(filename)
-    .resize(320, 240)
+    .resize(200, 200)
     .toFile(thumbnail);
 }
 
