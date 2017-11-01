@@ -1,15 +1,6 @@
 const fs = require('fs');
-const path = require('path');
+const ensureDirectoryExistence = require('./ensureDirectoryExistence');
 const summariseFilteredList = require('./summariseFilteredList');
-
-function ensureDirectoryExistence(filePath) {
-  const dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  return fs.mkdirSync(dirname);
-}
 
 function writeJson(obj, filePath) {
   return new Promise((resolve, reject) => {

@@ -1,26 +1,28 @@
-const Jimp = require('jimp');
+const sharp = require('sharp');
 const path = require('path');
+const ensureDirectoryExistence = require('./ensureDirectoryExistence');
 
-function createThumbnail(filename, options) {
-  return new Promise((resolve) => {
-    Jimp.read(filename).then((image) => {
-      const thumbnail = path.join(options.thumbs, filename.split('/').pop());
-      image.resize(200, Jimp.AUTO)
-        .quality(60)
-        .write(thumbnail);
-      resolve(thumbnail);
-    }).catch((err) => {
-      resolve(err);
-    });
-  });
+function createThumbnailFilename(filename, thumbPath) {
+  return path.join(thumbPath, filename.split('/').pop());
+}
+
+function createThumbnail(filename, thumbnail) {
+  return sharp(filename)
+    .resize(320, 240)
+    .toFile(thumbnail);
 }
 
 function createThumbnails(list, config) {
-  return Promise.all(list.map(listItem => createThumbnail(listItem.path, config)
-    .then(thumbnail => ({
-      ...listItem,
-      thumbnail,
-    }))));
+  ensureDirectoryExistence(path.join(process.cwd(), config.thumbs, list[0].path));
+  return Promise.all(list.map((listItem) => {
+    const thumbnail = createThumbnailFilename(listItem.path, config.thumbs);
+    return createThumbnail(listItem.path, thumbnail)
+      .then(thumbData => ({
+        ...listItem,
+        thumbnail,
+        thumbData,
+      }));
+  }));
 }
 
 module.exports = createThumbnails;
