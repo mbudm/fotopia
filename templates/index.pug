@@ -10,7 +10,7 @@ html
       p Accepted #{summary.accepted} Rejected: #{summary.rejected}
       h4 Tally by rejection reason:
       dl
-      each amount, reason in summary.Tally.length
+      each amount, reason in summary.Tally
         dt= reason
         dd= amount
     section

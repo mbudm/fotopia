@@ -5,7 +5,7 @@ function createThumbnail(filename, options) {
   return new Promise((resolve) => {
     Jimp.read(filename).then((image) => {
       const thumbnail = path.join(options.thumbs, filename.split('/').pop());
-      image.resize(256, 256)
+      image.resize(200, Jimp.AUTO)
         .quality(60)
         .write(thumbnail);
       resolve(thumbnail);
