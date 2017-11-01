@@ -3,6 +3,8 @@ html
   include file.pug
   head
     title Fotopia Reviewer
+    style
+      include style.css
   body
     header
       h1 Fotopia Revewer
@@ -10,16 +12,16 @@ html
       p Accepted: #{summary.Accepted} Rejected: #{summary.Rejected}
       h4 Tally by rejection reason:
       dl
-      each amount, reason in summary.Tally
-        dt= reason
-        dd= amount
+        each amount, reason in summary.Tally
+          dt= reason
+          dd= amount
     section
       h2 Rejected files
-      ul
-      each item in rejected
-        +file(item)
+      ul.image-grid
+        each item in rejected
+          +file(item)
     section
       h2 Accepted files
-      ul
-      each item in accepted
-        +file(item)
+      ul.image-grid
+        each item in accepted
+          +file(item)

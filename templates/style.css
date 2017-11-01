@@ -1,0 +1,17 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css');
+
+ul.image-grid {
+  list-style-type: none;
+  display: flex;
+}
+ul.image-grid li{
+  flex: 1;
+  margin:10px;
+}
+.image-details{
+  display:none;
+}
+
+figure:hover .image-details{
+  display:block;
+}
