@@ -1,8 +1,8 @@
 # fotopia
 Some tools to make sense of a chaotic and disorganised photo archive, and a web app that will store them
 
-# The apps
-This repo is divided up into the separate projects
+# The projects
+This repo is divided up into separate projects
 - fotopia-gathering
 - fotopia-web-app
 
