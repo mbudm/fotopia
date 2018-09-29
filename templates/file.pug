@@ -1,0 +1,21 @@
+mixin file(item, source)
+  - var fileName = item.path.split('/').pop();
+  li.col-2.col-md-3.col-sm-4
+    figure.figure
+      img(src=item.thumbnail).figure-img.img-fluid.rounded
+      figcaption.figure-caption #{fileName}
+      div.image-details
+        h4 Details
+        dl
+          if item.reason
+            dt Rejected for:
+            dd #{item.reason}
+          dt width
+          dd #{item.width}
+          dt height
+          dd #{item.height}
+          dt size
+          dd #{item.size}
+          dt birthtime
+          dd #{item.birthtime}
+        +parseObject('Exif Data', item.exifData)

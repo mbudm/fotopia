@@ -1,0 +1,12 @@
+mixin parseObject(title, obj)
+  - var len = obj ? Object.keys(obj).length : 0 ;
+  if (len > 0 )
+    dl
+    h4 #{title}
+    each val, key in obj
+      - var str = Array.isArray(val) ? val.join(', ') : (typeof val === 'object' ? null : val) ;
+      if (typeof str === 'string' || typeof str === 'number')
+        dt #{key}
+        dd #{str}
+      else
+        +parseObject(key, val)

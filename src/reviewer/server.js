@@ -12,6 +12,14 @@ function createReviewServer(filePath) {
         app.get('/', (req, res) => {
           res.render('index', data);
         });
+        app.post('/upload', (req, res) => {
+          res.send('Got a POST request');
+        });
+        // more paths
+        // reject
+        // accept
+        // upload [array]
+        // rotate left 90 / rotate right 90
         const listener = app.listen(3000, () => {
           resolve(listener);
         });

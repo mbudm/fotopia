@@ -1,0 +1,35 @@
+doctype html
+html
+  include parseObject.pug
+  include file.pug
+  head
+    title Fotopia Reviewer
+    link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO", crossorigin="anonymous")
+    style
+      include style.css
+  body
+    header.container-fluid
+      h1 Fotopia Revewer
+      p Source #{source}
+      p Accepted: #{summary.Accepted} Rejected: #{summary.Rejected}
+      h4 Tally by rejection reason:
+      dl
+        each amount, reason in summary.Tally
+          dt= reason
+          dd= amount
+    section.container-fluid
+      h2 Rejected files
+      ul.row.list-unstyled
+        each item in rejected
+          +file(item)
+    section.container-fluid
+      h2 Accepted files
+        button#upload-accepted-images upload
+      ul.row.list-unstyled
+        each item in accepted
+          +file(item)
+    script(src="https://code.jquery.com/jquery-3.3.1.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js")
+    script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js")
+    script
+      include script.js
