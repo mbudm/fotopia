@@ -10,6 +10,7 @@
     "no-console": 0
   },
   "globals": {
-    "$": true
+    "$": true,
+    "fetch": true
   }
 }

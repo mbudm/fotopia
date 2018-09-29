@@ -1,5 +1,8 @@
+require('babel-register');
+
 const config = require('../config');
 const fileTools = require('./fileTools');
+const uploader = require('./uploader');
 const createReviewServer = require('./reviewer/server');
 const path = require('path');
 const colors = require('colors/safe');
@@ -25,10 +28,16 @@ function buildListPath() {
   return path.join(config.temp, `${cwdPrefix.pop()}-${timestamp}.json`);
 }
 
-const existingFile = argv['existing-file'];
+const reviewExistingFile = argv['review-file'];
+const uploadExistingFile = argv['upload-file'];
 
-if (existingFile) {
-  createReviewServer(existingFile)
+if (uploadExistingFile) {
+  uploader(uploadExistingFile)
+    .catch((e) => {
+      console.log(colors.red('Oh no, we errored somewhere'), e);
+    });
+} else if (reviewExistingFile) {
+  createReviewServer(reviewExistingFile, uploader)
     .then((appListener) => {
       const address = appListener.address();
       console.log(colors.green(`Success! You can now review your sorted images at: \nhttp://localhost:${address.port}`));
@@ -41,7 +50,7 @@ if (existingFile) {
     .then(fileList => logThen('getFiles', createFilelistLogData(fileList), fileTools.createThumbnails(fileList.data, config)))
     .then(thumbsList => logThen('thumbsCreated', { thubs: thumbsList.length }, fileTools.filterFiles(config, thumbsList)))
     .then(filteredList => logThen('filterFiles', fileTools.summariseFilteredList(filteredList), fileTools.writeJson(filteredList, buildListPath())))
-    .then(filePath => logThen('listSaved', { filePath }, createReviewServer(filePath)))
+    .then(filePath => logThen('listSaved', { filePath }, createReviewServer(filePath, uploader)))
     .then((appListener) => {
       const address = appListener.address();
       console.log(colors.green(`Success! You can now review your sorted images at: \nhttp://localhost:${address.port}`));

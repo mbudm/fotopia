@@ -1,7 +1,7 @@
 const express = require('express');
 const fileTools = require('./../fileTools');
 
-function createReviewServer(filePath) {
+function createReviewServer(filePath, uploader) {
   return fileTools.readJson(filePath)
     .then(data => new Promise((resolve, reject) => {
       try {
@@ -13,7 +13,9 @@ function createReviewServer(filePath) {
           res.render('index', data);
         });
         app.post('/upload', (req, res) => {
-          res.send('Got a POST request');
+          uploader(filePath)
+            .then(res.send)
+            .catch(err => res.status(500).send(err));
         });
         // more paths
         // reject

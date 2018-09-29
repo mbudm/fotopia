@@ -7,12 +7,9 @@ module.exports = {
   cwd: '/path/to/images',
   temp: './temp',
   thumbs: './thumbs',
-  api: {
-    kairos: {
-      appId: '<your app id>',
-      key: '<key>',
-      base_url: 'api.kairos.com',
-      gallery: 'fotopia',
-    },
+  fotopia: {
+    api: 'https://api.your-fotopia-instance.com',
+    user: 'fotopia-user',
+    pwd: 'fotopia-user-pwd',
   },
 };
