@@ -28,12 +28,8 @@ function createRecord(file, signedIn, responseBody = {}) {
 
 function uploadFile(file, signedIn) {
   const object = fs.createReadStream(file.path);
-  // const body = createRecord(file, signedIn, { key: file.src });
-  // console.log(JSON.stringify({
-  //   objType: typeof object,
-  //   body,
-  // }, null, 2));
-  return upload(file.src, object, {
+  const key = `${signedIn.username}/${file.src}`;
+  return upload(key, object, {
     contentType: 'image/jpeg',
   })
     .then((responseBody) => {
@@ -55,7 +51,7 @@ function uploadPromiseMap(files, signedIn) {
   const reducer = (responsesAcc, file) =>
     responsesAcc.then(responseAcc => uploadFile(file, signedIn)
       .then((response) => {
-        console.log('Response:', JSON.stringify(response, null, 2));
+        console.log('Created:', response.img_key);
         responseAcc.push(response);
         return responseAcc;
       }));
