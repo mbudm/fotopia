@@ -1,11 +1,13 @@
 require('isomorphic-fetch');
 const fs = require('fs');
+const omitEmpty = require('omit-empty');
+
 const fileTools = require('./fileTools');
 const config = require('../config');
 const auth = require('./remote/auth');
 const { post } = require('./remote/api');
 const upload = require('./remote/upload');
-const omitEmpty = require('omit-empty');
+
 
 function createRecord(file, signedIn, responseBody = {}) {
   // avoid ValidationException errors with empty attrubutes
@@ -36,6 +38,7 @@ function uploadFile(file, signedIn) {
   })
     .then((responseBody) => {
       const body = createRecord(file, signedIn, responseBody);
+      console.log('Uploaded, now creating:', body.img_key);
       return post(config.fotopia.api, '/create', {
         body,
       });
