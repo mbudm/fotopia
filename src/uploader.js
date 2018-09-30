@@ -5,15 +5,19 @@ const config = require('../config');
 const auth = require('./remote/auth');
 const { post } = require('./remote/api');
 const upload = require('./remote/upload');
+const omitEmpty = require('omit-empty');
 
 function createRecord(file, signedIn, responseBody = {}) {
+  // avoid ValidationException errors with empty attrubutes
+  // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
+  const fileWithNoEmptyProps = omitEmpty(file);
   return {
     username: signedIn.username,
     userIdentityId: config.fotopia.userIdentityId,
     birthtime: file.birthtime,
     img_key: responseBody.key,
     meta: {
-      ...file,
+      ...fileWithNoEmptyProps,
     },
     tags: [],
     people: [],
@@ -27,7 +31,7 @@ function uploadFile(file, signedIn) {
   //   objType: typeof object,
   //   body,
   // }, null, 2));
-  upload(file.src, object, {
+  return upload(file.src, object, {
     contentType: 'image/jpeg',
   })
     .then((responseBody) => {
@@ -44,15 +48,25 @@ function getApiConfig() {
     .then(response => response.json());
 }
 
+function uploadPromiseMap(files, signedIn) {
+  const reducer = (responsesAcc, file) =>
+    responsesAcc.then(responseAcc => uploadFile(file, signedIn)
+      .then((response) => {
+        console.log('Response:', JSON.stringify(response, null, 2));
+        responseAcc.push(response);
+        return responseAcc;
+      }));
+  return files.reduce(reducer, Promise.resolve([]));
+}
+
 function uploader(filePath) {
   return getApiConfig()
     .then(apiConfig => auth(apiConfig, config.fotopia))
     .then((signedIn) => {
-      console.log('signedIn', JSON.stringify(signedIn, null, 2));
       fileTools.readJson(filePath)
         .then((data) => {
           if (Array.isArray(data.accepted)) {
-            return Promise.all(data.accepted.map(file => uploadFile(file, signedIn)));
+            return uploadPromiseMap(data.accepted, signedIn);
           }
           throw new Error('No accepted images');
         })

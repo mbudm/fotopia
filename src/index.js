@@ -33,6 +33,9 @@ const uploadExistingFile = argv['upload-file'];
 
 if (uploadExistingFile) {
   uploader(uploadExistingFile)
+    .then((responses) => {
+      console.log('Success! All files uploaded and created', responses);
+    })
     .catch((e) => {
       console.log(colors.red('Oh no, we errored somewhere'), e);
     });
