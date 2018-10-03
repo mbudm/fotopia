@@ -6,7 +6,7 @@ const fileTools = require('./fileTools');
 const config = require('../config');
 const auth = require('./remote/auth');
 const { post } = require('./remote/api');
-const upload = require('./remote/upload');
+const { upload, list } = require('./remote/storage');
 
 
 function createRecord(file, signedIn, responseBody = {}) {
@@ -26,9 +26,13 @@ function createRecord(file, signedIn, responseBody = {}) {
   };
 }
 
+function getKey(signedIn, file) {
+  return `${signedIn.username}/${file.src}`;
+}
+
 function uploadFile(file, signedIn) {
   const object = fs.createReadStream(file.path);
-  const key = `${signedIn.username}/${file.src}`;
+  const key = getKey(signedIn, file);
   return upload(key, object, {
     contentType: 'image/jpeg',
   })
@@ -58,18 +62,29 @@ function uploadPromiseMap(files, signedIn) {
   return files.reduce(reducer, Promise.resolve([]));
 }
 
+function removeExistingObjects(existing = [], uploadables, signedIn) {
+  console.log('existing', existing);
+  return uploadables.filter(uploadable => !existing.includes(getKey(signedIn, uploadable)));
+}
+
+function readJsonAndUpload(filePath, existingObjects, signedIn) {
+  return fileTools.readJson(filePath)
+    .then((data) => {
+      if (Array.isArray(data.accepted)) {
+        const acceptedAndNew = removeExistingObjects(existingObjects, data.accepted);
+        return uploadPromiseMap(acceptedAndNew, signedIn);
+      }
+      throw new Error('No accepted images');
+    })
+    .catch(e => console.error(e));
+}
+
 function uploader(filePath) {
   return getApiConfig()
     .then(apiConfig => auth(apiConfig, config.fotopia))
     .then((signedIn) => {
-      fileTools.readJson(filePath)
-        .then((data) => {
-          if (Array.isArray(data.accepted)) {
-            return uploadPromiseMap(data.accepted, signedIn);
-          }
-          throw new Error('No accepted images');
-        })
-        .catch(e => console.error(e));
+      list(`${signedIn.username}/`)
+        .then(existingObjects => readJsonAndUpload(filePath, existingObjects, signedIn));
     });
 }
 

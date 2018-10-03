@@ -2,25 +2,26 @@ import AWS from 'aws-sdk';
 import Amplify from 'aws-amplify';
 
 
-function configureAmplify(config) {
+function configureAmplify(apiConfig, userConfig) {
+  console.log('userConfig.api', userConfig, apiConfig.ServiceEndpoint);
   Amplify.configure({
     Auth: {
-      identityPoolId: config.IdentityPoolId,
-      region: config.Region,
-      userPoolId: config.UserPoolId,
-      userPoolWebClientId: config.UserPoolClientId,
+      identityPoolId: apiConfig.IdentityPoolId,
+      region: apiConfig.Region,
+      userPoolId: apiConfig.UserPoolId,
+      userPoolWebClientId: apiConfig.UserPoolClientId,
     },
     Storage: {
-      region: config.Region,
-      bucket: config.Bucket,
-      identityPoolId: config.IdentityPoolId,
+      region: apiConfig.Region,
+      bucket: apiConfig.Bucket,
+      identityPoolId: apiConfig.IdentityPoolId,
     },
     API: {
       endpoints: [
         {
           name: 'fotos',
-          endpoint: config.ServiceEndpoint,
-          region: config.Region,
+          endpoint: userConfig.api,
+          region: apiConfig.Region,
         },
       ],
     },
@@ -29,7 +30,7 @@ function configureAmplify(config) {
 
 function authenticateExistingUser(apiConfig, userConfig) {
   return new Promise((resolve, reject) => {
-    configureAmplify(apiConfig);
+    configureAmplify(apiConfig, userConfig);
     Amplify.Auth.signIn(userConfig.user, userConfig.pwd)
       .then(resolve)
       .catch(reject);
