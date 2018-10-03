@@ -6,7 +6,7 @@ const fileTools = require('./fileTools');
 const config = require('../config');
 const auth = require('./remote/auth');
 const { post } = require('./remote/api');
-const { upload, list } = require('./remote/storage');
+const { upload } = require('./remote/storage');
 
 
 function createRecord(file, signedIn, responseBody = {}) {
@@ -62,17 +62,11 @@ function uploadPromiseMap(files, signedIn) {
   return files.reduce(reducer, Promise.resolve([]));
 }
 
-function removeExistingObjects(existing = [], uploadables, signedIn) {
-  console.log('existing', existing);
-  return uploadables.filter(uploadable => !existing.includes(getKey(signedIn, uploadable)));
-}
-
-function readJsonAndUpload(filePath, existingObjects, signedIn) {
+function readJsonAndUpload(filePath, signedIn) {
   return fileTools.readJson(filePath)
     .then((data) => {
       if (Array.isArray(data.accepted)) {
-        const acceptedAndNew = removeExistingObjects(existingObjects, data.accepted);
-        return uploadPromiseMap(acceptedAndNew, signedIn);
+        return uploadPromiseMap(data.accepted, signedIn);
       }
       throw new Error('No accepted images');
     })
@@ -82,10 +76,7 @@ function readJsonAndUpload(filePath, existingObjects, signedIn) {
 function uploader(filePath) {
   return getApiConfig()
     .then(apiConfig => auth(apiConfig, config.fotopia))
-    .then((signedIn) => {
-      list(`${signedIn.username}/`)
-        .then(existingObjects => readJsonAndUpload(filePath, existingObjects, signedIn));
-    });
+    .then(signedIn => readJsonAndUpload(filePath, signedIn));
 }
 
 module.exports = uploader;
