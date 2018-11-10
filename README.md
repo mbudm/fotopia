@@ -13,7 +13,10 @@ A collection of node scripts for sorting through a photo archive and working out
   - depending on the amount of images in your folder this can take a while. Tested with a HD containing 60k images, this took **10 minutes**.
 
 If you've alread run `yarn start` on a folder then there's no need to rerun the whole thing, just reload the review server with an existing file:
-- `yarn start --existing-file /path/to/temp/generated-file.json`
+- `yarn start --review-file /path/to/temp/generated-file.json`
+
+Or upload directly with
+- `yarn start --upload-file /path/to/temp/generated-file.json`
 
 ## Tests
 - `yarn test`
