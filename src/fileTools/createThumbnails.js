@@ -13,6 +13,9 @@ function createThumbnail(filename, thumbnail) {
 }
 
 function createThumbnails(list, config) {
+  if (!Array.isArray(list) || list.length === 0) {
+    throw new Error(`list is null or empty ${list}`);
+  }
   ensureDirectoryExistence(path.join(process.cwd(), config.thumbs, list[0].path));
   return Promise.all(list.map((listItem) => {
     const thumbnail = createThumbnailFilename(listItem.path, config.thumbs);

@@ -1,17 +1,21 @@
-require('babel-register');
+import * as path from 'path';
+import * as colors from 'colors/safe';
+import { argv } from 'yargs';
 
-const config = require('../config');
-const fileTools = require('./fileTools');
-const uploader = require('./uploader');
-const createReviewServer = require('./reviewer/server');
-const path = require('path');
-const colors = require('colors/safe');
-const { argv } = require('yargs');
+import {config} from '../config';
+import fileTools from './fileTools';
+import uploader from './uploader';
+import createReviewServer from './reviewer/server';
+
 
 const startTime = Date.now();
 
-function logThen(message, data, cbPromise) {
+function log(message, data?) {
   console.log(`${message}: ${JSON.stringify(data, null, 2)} (${Date.now() - startTime}ms)`);
+}
+
+function logThen(message, data, cbPromise) {
+  log(`${message}: ${JSON.stringify(data, null, 2)} (${Date.now() - startTime}ms)`);
   return cbPromise;
 }
 
@@ -38,6 +42,7 @@ if (uploadExistingFile) {
     })
     .catch((e) => {
       console.log(colors.red('Oh no, we errored somewhere'), e);
+      process.exit(1);
     });
 } else if (reviewExistingFile) {
   createReviewServer(reviewExistingFile, uploader)
@@ -47,10 +52,14 @@ if (uploadExistingFile) {
     })
     .catch((e) => {
       console.log(colors.red('Oh no, we errored somewhere'), e);
+      process.exit(1);
     });
 } else {
   fileTools.getFiles(config)
-    .then(fileList => logThen('getFiles', createFilelistLogData(fileList), fileTools.createThumbnails(fileList.data, config)))
+    .then((fileList) => {
+      log('getFiles', createFilelistLogData(fileList));
+      return fileTools.createThumbnails(fileList.data, config);
+    })
     .then(thumbsList => logThen('thumbsCreated', { thubs: thumbsList.length }, fileTools.filterFiles(config, thumbsList)))
     .then(filteredList => logThen('filterFiles', fileTools.summariseFilteredList(filteredList), fileTools.writeJson(filteredList, buildListPath())))
     .then(filePath => logThen('listSaved', { filePath }, createReviewServer(filePath, uploader)))
@@ -60,6 +69,7 @@ if (uploadExistingFile) {
     })
     .catch((e) => {
       console.log(colors.red('Oh no, we errored somewhere'), e);
+      process.exit(1);
     });
 }
 
