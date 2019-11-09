@@ -24,7 +24,6 @@
     "test"
   ],
   "dependencies": {
-    "aws-amplify": "1.2.2",
     "aws-sdk": "^2.562.0",
     "babel-register": "^6.26.0",
     "colors": "^1.4.0",

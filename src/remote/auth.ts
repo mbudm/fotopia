@@ -1,86 +1,89 @@
 import "isomorphic-fetch";
 
-// import * as awsCredsLoader from 'aws-creds-loader';
+import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk";
-import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
+import { CognitoIdentityCredentials } from "aws-sdk";
 
-// awsCredsLoader(AWS);
-
-export function checkUserExists(config: any, userConfig) {
-  const username = userConfig.user;
-  const cognitoISP = new AWS.CognitoIdentityServiceProvider({
-    region: config.Region,
-  });
-  return cognitoISP.listUsers({
-    Filter: `username = "${username}"`,
-    UserPoolId: config.UserPoolId,
-  }).promise();
-}
-
-export function signIn(apiConfig, userConfig){
-  return new Promise((res, rej) => {
+function authenticateExistingUser(config: any, userConfig) {
+  return new Promise((resolve, reject) => {
     const authenticationData = {
-      Username : userConfig.user,
-      Password : userConfig.pwd,
+      Password : userConfig.pwd || "",
+      Username : userConfig.user || "",
     };
     const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
     const poolData = {
-      UserPoolId : apiConfig.UserPoolId,
-      ClientId : apiConfig.UserPoolClientId
+      ClientId : config.UserPoolClientId,
+      UserPoolId : config.UserPoolId,
     };
     const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     const userData = {
-      Username : userConfig.user,
-      Pool : userPool
+        Pool : userPool,
+        Username : authenticationData.Username,
     };
     const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
     cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: function (result) {
-            const accessToken = result.getAccessToken().getJwtToken();
-            // fetch(`${userConfig.api}/query`, {
-            //   method: 'POST',
-            //   headers: {
-            //     accesstoken: accessToken
-            //   }
-            // })
-            // .then((response) => {
-            //   console.log('test api call', response)
-            // })
-            // .catch((err) => {
-            //   console.error('Test api err', err)
-            // })
-            /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer*/
-            const idToken = result.getIdToken();
-            const cognitoLogin = `cognito-idp.${apiConfig.Region}.amazonaws.com/${apiConfig.UserPoolId}`;
-            console.log("cognitoLogin", cognitoLogin);
-
-            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-              IdentityPoolId: apiConfig.IdentityPoolId,
-              Logins: {
-                [cognitoLogin]: idToken.getJwtToken()
-              }
-            });
-
-            AWS.config.credentials['get'](function(){
-              res({
-                accessToken,
-                idToken,
-                creds: AWS.config.credentials
-              })
-          });
-
-
-        },
-        onFailure: function(err) {
-            rej(err);
-        },
+      onSuccess(result) {
+        resolve(result);
+      },
+      onFailure(err) {
+        reject(err);
+      },
     });
   });
 }
 
-export default function auth(apiConfig: any, userConfig) {
-  return checkUserExists(apiConfig, userConfig)
-    .then((result) => signIn(apiConfig, userConfig))
+function getCurrentUser(config) {
+  const userPool = new  AmazonCognitoIdentity.CognitoUserPool({
+    ClientId : config.UserPoolClientId,
+    UserPoolId : config.UserPoolId,
+  });
+  return userPool.getCurrentUser();
+}
+
+function getUserToken(currentUser) {
+  return new Promise((resolve, reject) => {
+    currentUser.getSession((err, session) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(session.getIdToken().getJwtToken());
+    });
+  });
+}
+
+function getAwsCredentials(config: any, userToken) {
+  const authenticator = `cognito-idp.${config.Region}.amazonaws.com/${config.UserPoolId}`;
+
+  AWS.config.update({ region: config.Region});
+  AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: config.IdentityPoolId,
+    Logins: {
+      [authenticator]: userToken,
+    },
+  });
+
+  // tslint:disable-next-line:no-string-literal
+  return AWS.config.credentials["getPromise"]()
+  .then(() => {
+    const cognitoCreds: CognitoIdentityCredentials = AWS.config.credentials as CognitoIdentityCredentials;
+    return {
+      bucket: config.Bucket,
+      userIdentityId: cognitoCreds.identityId,
+      credentials: {
+        accessKeyId: AWS.config.credentials!.accessKeyId,
+        sessionToken: AWS.config.credentials!.sessionToken,
+        secretAccessKey: AWS.config.credentials!.secretAccessKey,
+      }
+    };
+  });
+}
+
+export default function auth(config: any, userConfig) {
+  return authenticateExistingUser(config, userConfig)
+    .then(() => getCurrentUser(config))
+    .then(getUserToken)
+    .then((userToken) => getAwsCredentials(config, userToken))
     .catch((err) => {
       // tslint:disable-next-line:no-console
       console.error("check user err", err);
