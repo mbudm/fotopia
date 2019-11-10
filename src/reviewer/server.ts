@@ -1,7 +1,7 @@
-const express = require('express');
-const fileTools = require('./../fileTools');
+import * as express from 'express';
+import * as fileTools from './../fileTools';
 
-function createReviewServer(filePath, uploader) {
+export function createReviewServer(filePath, uploader) {
   return fileTools.readJson(filePath)
     .then(data => new Promise((resolve, reject) => {
       try {
@@ -31,4 +31,3 @@ function createReviewServer(filePath, uploader) {
     }));
 }
 
-module.exports = createReviewServer;

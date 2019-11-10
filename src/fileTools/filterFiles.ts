@@ -32,10 +32,10 @@ function isDuplicate(item, lookup) {
   return false;
 }
 
-function filterFiles(config, fileList) {
+export function filterFiles(config, fileList) {
   const filteredItems = {
-    rejected: [],
-    accepted: [],
+    rejected: [] as string[],
+    accepted: [] as any[],
   };
   const lookup = {};
   fileList.forEach((item) => {
@@ -61,5 +61,3 @@ function filterFiles(config, fileList) {
   });
   return filteredItems;
 }
-
-module.exports = filterFiles;

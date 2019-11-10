@@ -1,6 +1,6 @@
-const sharp = require('sharp');
-const path = require('path');
-const ensureDirectoryExistence = require('./ensureDirectoryExistence');
+import * as sharp from 'sharp';
+import * as path from 'path';
+import ensureDirectoryExistence from './ensureDirectoryExistence';
 
 function createThumbnailFilename(filename, thumbPath) {
   return path.join(thumbPath, filename.split('/').pop());
@@ -12,7 +12,7 @@ function createThumbnail(filename, thumbnail) {
     .toFile(thumbnail);
 }
 
-function createThumbnails(list, config) {
+export function createThumbnails(list: any[], config) {
   if (!Array.isArray(list) || list.length === 0) {
     throw new Error(`list is null or empty ${list}`);
   }
@@ -28,4 +28,3 @@ function createThumbnails(list, config) {
   }));
 }
 
-module.exports = createThumbnails;

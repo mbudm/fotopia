@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob');
-const { ExifImage } = require('exif');
-const getImageDimensions = require('image-size');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as glob from 'glob';
+import { ExifImage } from 'exif';
+import { imageSize as getImageSize} from 'image-size';
 
 
 function getExtension(filePath) {
@@ -22,7 +22,7 @@ function collectExtensions(files) {
   }, {});
 }
 
-function getFileList(pattern = '**/*', opts) {
+function getFileList(pattern = '**/*', opts): Promise<any[]> {
   return new Promise((resolve, reject) => {
     glob(pattern, opts, (er, files) => {
       if (er) {
@@ -53,7 +53,7 @@ function normaliseExif(exifData) {
 
 function getImageDimensionsPromise(image) {
   return new Promise((resolve) => {
-    getImageDimensions(image, (err, dimensions) => {
+    getImageSize(image, (err, dimensions) => {
       if (err) {
         resolve({ err });
       } else {
@@ -111,7 +111,7 @@ function getImageData(cwd, image) {
   }));
 }
 
-function getFiles(config) {
+export function getFiles(config): Promise<any> {
   const options = {
     cwd: config.cwd,
     nodir: true,
@@ -120,11 +120,11 @@ function getFiles(config) {
   const extensionsToSearch = config.extensions.length > 1 ? `{${config.extensions.join()}}` : config.extensions[0];
   let extensions = null;
   return getFileList(`**/*.${extensionsToSearch}`, options)
-    .then((files) => {
+    .then((files: any[]) => {
       extensions = collectExtensions(files);
       return Promise.all(files.map(file => getImageData(options.cwd, file)));
     })
-    .then(filesData => Promise.all(filesData.map(fileData => getFileStats(fileData.path)
+    .then((filesData: any[]) => Promise.all(filesData.map(fileData => getFileStats(fileData.path)
       .then(stats => ({
         ...fileData,
         ...stats,
@@ -136,4 +136,3 @@ function getFiles(config) {
     .catch(err => console.error(err));
 }
 
-module.exports = getFiles;

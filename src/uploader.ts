@@ -15,7 +15,7 @@ let apiConfig;
 let authConfig;
 
 function getKey(file) {
-  return `${config.fotopia.user}/${file.src}`;
+  return `${config.fotopia.user}/${file.path}`;
 }
 
 function createRecord(file) {
@@ -57,22 +57,24 @@ function getApiConfig() {
     .then(response => response.json());
 }
 
-function uploadPromiseMap(files) {
-  const reducer = (responsesAcc, file) =>
-    responsesAcc.then(responseAcc => uploadFile(file)
-      .then((response) => {
-        console.log('Created:', response.img_key);
-        responseAcc.push(response);
-        return responseAcc;
-      }));
-  return files.reduce(reducer, Promise.resolve([]));
+async function uploadManager(files) {
+  const responses: any[] = [];
+  let uploading = files.length > 0;
+  let counter = 0;
+  while(uploading){
+    const uploadResponse = await uploadFile(files[counter]);
+    responses.push(uploadResponse);
+    counter++;
+    uploading = counter < files.length
+  }
+  return responses
 }
 
 function readJsonAndUpload(filePath) {
   return fileTools.readJson(filePath)
-    .then((data) => {
+    .then((data: any) => {
       if (Array.isArray(data.accepted)) {
-        return uploadPromiseMap(data.accepted);
+        return uploadManager(data.accepted);
       }
       throw new Error('No accepted images');
     })

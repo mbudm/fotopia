@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 function ensureDirectoryExistence(filePath) {
   const dirname = path.dirname(filePath);
@@ -12,4 +12,4 @@ function ensureDirectoryExistence(filePath) {
   return fs.mkdirSync(dirname);
 }
 
-module.exports = ensureDirectoryExistence;
+export default ensureDirectoryExistence;

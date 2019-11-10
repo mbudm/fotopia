@@ -1,8 +1,8 @@
-const fs = require('fs');
-const ensureDirectoryExistence = require('./ensureDirectoryExistence');
-const summariseFilteredList = require('./summariseFilteredList');
+import * as fs from 'fs';
+import ensureDirectoryExistence from './ensureDirectoryExistence';
+import {summariseFilteredList} from './summariseFilteredList';
 
-function writeJson(obj, filePath) {
+export function writeJson(obj, filePath) {
   return new Promise((resolve, reject) => {
     ensureDirectoryExistence(filePath);
 
@@ -25,5 +25,3 @@ function writeJson(obj, filePath) {
     }
   });
 }
-
-module.exports = writeJson;

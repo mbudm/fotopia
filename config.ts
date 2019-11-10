@@ -4,7 +4,7 @@ export const config = {
     fileSize: 100000, // bytes
     pixels: (640 * 480),
   },
-  cwd: '/Users/steve/dev/fotopia/temp/bigsample',
+  cwd: '/Users/steve/Dropbox/test uploads',
   temp: './temp',
   thumbs: './thumbs',
   fotopia: {

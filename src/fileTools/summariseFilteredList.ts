@@ -8,12 +8,10 @@ function getTally(filteredList) {
   }, {});
 }
 
-function summariseFilteredList(filteredList) {
+export function summariseFilteredList(filteredList) {
   return {
     Accepted: filteredList.accepted.length,
     Rejected: filteredList.rejected.length,
     Tally: getTally(filteredList),
   };
 }
-
-module.exports = summariseFilteredList;

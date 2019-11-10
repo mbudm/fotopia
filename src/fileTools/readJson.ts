@@ -1,14 +1,14 @@
-const fs = require('fs');
+import * as fs from 'fs';
 
-function readJson(filename) {
+export function readJson(filename) {
   return new Promise((resolve, reject) => {
-    fs.readFile(filename, (err, json) => {
+    fs.readFile(filename, (err, jsonBuffer) => {
       if (err) {
         reject(err);
         return;
       }
       try {
-        const data = JSON.parse(json);
+        const data = JSON.parse(jsonBuffer.toString());
         resolve(data);
       } catch (exception) {
         reject(exception);
@@ -16,5 +16,3 @@ function readJson(filename) {
     });
   });
 }
-
-module.exports = readJson;

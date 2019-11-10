@@ -3,9 +3,9 @@ import * as colors from 'colors/safe';
 import { argv } from 'yargs';
 
 import {config} from '../config';
-import fileTools from './fileTools';
+import * as fileTools from './fileTools';
 import uploader from './uploader';
-import createReviewServer from './reviewer/server';
+import {createReviewServer} from './reviewer/server';
 
 
 const startTime = Date.now();
@@ -46,7 +46,7 @@ if (uploadExistingFile) {
     });
 } else if (reviewExistingFile) {
   createReviewServer(reviewExistingFile, uploader)
-    .then((appListener) => {
+    .then((appListener: any) => {
       const address = appListener.address();
       console.log(colors.green(`Success! You can now review your sorted images at: \nhttp://localhost:${address.port}`));
     })
