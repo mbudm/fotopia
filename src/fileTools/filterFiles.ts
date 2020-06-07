@@ -34,7 +34,7 @@ function isDuplicate(item, lookup) {
 
 export function filterFiles(config, fileList) {
   const filteredItems = {
-    rejected: [] as string[],
+    rejected: [] as any[],
     accepted: [] as any[],
   };
   const lookup = {};

@@ -37,8 +37,8 @@ const uploadExistingFile = argv['upload-file'];
 
 if (uploadExistingFile) {
   uploader(uploadExistingFile)
-    .then(() => {
-      console.log('Upload and create in progress');
+    .then((responses: any[]) => {
+      console.log(`Upload and create of ${responses.length} images complete`);
     })
     .catch((e) => {
       console.log(colors.red('Oh no, we errored somewhere'), e);

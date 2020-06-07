@@ -15,7 +15,7 @@ let apiConfig;
 let authConfig;
 
 function getKey(file) {
-  return `${config.fotopia.user}/${file.path}`;
+  return `${config.fotopia.user}${file.path}`;
 }
 
 function createRecord(file) {
@@ -28,7 +28,8 @@ function createRecord(file) {
     birthtime: file.birthtime,
     img_key: getKey(file),
     meta: {
-      ...fileWithNoEmptyProps,
+      height: fileWithNoEmptyProps.height,
+      width: fileWithNoEmptyProps.width,
     },
     tags: [],
     people: [],

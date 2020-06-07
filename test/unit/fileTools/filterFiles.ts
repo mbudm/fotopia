@@ -1,6 +1,6 @@
-const test = require('tape');
-const path = require('path');
-const filterFiles = require('../../../src/fileTools/filterFiles');
+import * as path from "path";
+import * as test from "tape";
+import { filterFiles } from '../../../src/fileTools/filterFiles';
 
 const fileList = [
     {

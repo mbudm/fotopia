@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "lint": "eslint src",
-    "test": "tape test/**/*.js | tap-spec"
+    "test": "tape -r ts-node/register -r babel-register test/**/*.ts | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -20,7 +19,6 @@
   "author": "Steve Roberts",
   "license": "ISC",
   "pre-commit": [
-    "lint",
     "test"
   ],
   "dependencies": {

@@ -1,11 +1,11 @@
-const test = require('tape');
-const path = require('path');
-const getFiles = require('../../../src/fileTools/getFiles');
+import * as path from "path";
+import * as test from "tape";
+import { getFiles } from '../../../src/fileTools/getFiles';
 
 const mockBasePath = path.join(__dirname,'../../','mock');
 const mockImages = [
-    'large_colour_face_parsing_error.jpg', 
-    'large_group copy.jpg',          
+    'large_colour_face_parsing_error.jpg',
+    'large_group copy.jpg',
     'large_group.jpg',
     'large_nopeople_pretty.JPG',
     'large_person_obscure.JPG',
@@ -21,9 +21,9 @@ const config = {
 test('getFiles test, excluding jpeg', function (t) {
 
     t.plan(4);
-    
+
     t.equal(typeof getFiles, 'function');
-    
+
     const fileList = getFiles(config)
         .then(fileList => {
             t.equal(fileList.data.length, mockImages.length - 1);
@@ -33,10 +33,10 @@ test('getFiles test, excluding jpeg', function (t) {
 });
 
 test('getFiles test, including jpeg', function (t) {
-    
+
     config.extensions.push('jpeg');
     t.plan(3);
-    
+
     const fileList = getFiles(config)
         .then(fileList => {
             t.equal(fileList.data.length, mockImages.length);
@@ -46,10 +46,10 @@ test('getFiles test, including jpeg', function (t) {
 });
 
 test('getFiles test, handle exif error', function (t) {
-    
+
     config.extensions.push('jpeg');
     t.plan(5);
-    
+
     const fileList = getFiles(config)
         .then(fileList => {
             t.equal(typeof fileList.data[0].exifError, "object");
