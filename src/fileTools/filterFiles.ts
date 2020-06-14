@@ -32,6 +32,10 @@ function isDuplicate(item, lookup) {
   return false;
 }
 
+function isThumbnailCreated(item) {
+  return !!item.thumbError
+}
+
 export function filterFiles(config, fileList) {
   const filteredItems = {
     rejected: [] as any[],
@@ -52,6 +56,11 @@ export function filterFiles(config, fileList) {
     } else if (isDuplicate(item, lookup)) {
       filteredItems.rejected.push({
         reason: 'duplicate',
+        ...item,
+      });
+    } else if (isThumbnailCreated(item)) {
+      filteredItems.rejected.push({
+        reason: item.thumbError,
         ...item,
       });
     } else {

@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as glob from 'glob';
 import { ExifImage } from 'exif';
 import { imageSize as getImageSize} from 'image-size';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 
 function getExtension(filePath) {
@@ -51,7 +52,14 @@ function normaliseExif(exifData) {
   };
 }
 
-function getImageDimensionsPromise(image) {
+interface IExifData {
+  exifError?: string;
+  err?: Error;
+  width?: number;
+  height?: number;
+}
+
+function getImageDimensionsPromise(image): Promise<IExifData> {
   return new Promise((resolve) => {
     getImageSize(image, (err, dimensions) => {
       if (err) {
@@ -63,11 +71,11 @@ function getImageDimensionsPromise(image) {
   });
 }
 
-function getExifData(image) {
+function getExifData(image): Promise<IExifData> {
   return new Promise((resolve) => {
     createNewExifImage(image, (error, exifData) => {
       if (error) {
-        resolve(getImageDimensionsPromise(image).then(dimensions => ({
+        resolve(getImageDimensionsPromise(image).then((dimensions: ISizeCalculationResult) => ({
           exifError: error,
           ...dimensions,
         })));
@@ -78,7 +86,7 @@ function getExifData(image) {
   });
 }
 
-function getFileStats(image) {
+function getFileStats(image): Promise<any> {
   return new Promise((resolve) => {
     fs.stat(image, (error, stat) => {
       if (error) {

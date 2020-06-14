@@ -8,7 +8,7 @@ function ensureDirectoryExistence(filePath) {
     return true;
   }
   ensureDirectoryExistence(dirname);
-  console.log('about to makdir', dirname);
+  console.log('about to mkdir', dirname);
   return fs.mkdirSync(dirname);
 }
 

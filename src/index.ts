@@ -58,9 +58,11 @@ if (uploadExistingFile) {
   fileTools.getFiles(config)
     .then((fileList) => {
       log('getFiles', createFilelistLogData(fileList));
-      return fileTools.createThumbnails(fileList.data, config);
+      return config.thumbs ?
+        fileTools.createThumbnails(fileList.data, config)
+          .then(thumbsList => logThen('thumbsCreated', { thubs: thumbsList.length }, fileTools.filterFiles(config, thumbsList))) :
+        fileTools.filterFiles(config, fileList.data) ;
     })
-    .then(thumbsList => logThen('thumbsCreated', { thubs: thumbsList.length }, fileTools.filterFiles(config, thumbsList)))
     .then(filteredList => logThen('filterFiles', fileTools.summariseFilteredList(filteredList), fileTools.writeJson(filteredList, buildListPath())))
     .then(filePath => logThen('listSaved', { filePath }, createReviewServer(filePath, uploader)))
     .then((appListener) => {

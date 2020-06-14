@@ -24,6 +24,12 @@ export function createThumbnails(list: any[], config) {
         ...listItem,
         thumbnail,
         thumbData,
+      }))
+      .catch(error => ({
+        ...listItem,
+        thumbnail: 'error',
+        thumbError: error,
+        thumbData: null
       }));
   }));
 }

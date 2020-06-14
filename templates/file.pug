@@ -2,7 +2,12 @@ mixin file(item, source)
   - var fileName = item.path.split('/').pop();
   li.col-2.col-md-3.col-sm-4
     figure.figure
-      img(src=item.thumbnail).figure-img.img-fluid.rounded
+      if item.thumbnail
+        img(src=item.thumbnail).figure-img.img-fluid.rounded
+      else if item.src
+        img(src=item.src).figure-img.img-fluid.rounded
+      else
+        p no image available
       figcaption.figure-caption #{fileName}
       div.image-details
         h4 Details
