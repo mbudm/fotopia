@@ -22,7 +22,7 @@
     "test"
   ],
   "dependencies": {
-    "aws-sdk": "^2.562.0",
+    "aws-sdk": "^2.814.0",
     "babel-register": "^6.26.0",
     "colors": "^1.4.0",
     "exif": "^0.6.0",
